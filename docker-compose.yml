@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - type: volume
+        source: redisdata
+        target: /data
+    networks: 
+      - custom-network
+    configs:
+      - appendonly: 'yes'
+  mongodb:
+    image: "mongo:4.0.6-xenial"
+    volumes:
+      - "dbdata:/data/db"
+    networks: 
+      - custom-network
+  web:
+    container_name: my-web
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - mongodb
+    networks: 
+      - custom-network
+networks: 
+  custom-network:
+    external: true
+volumes:
+  dbdata: 
+    external: true
+  redisdata:
+    external: true
